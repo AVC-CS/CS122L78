@@ -2,8 +2,9 @@ import main
 import io
 import sys
 import re
+import pytest
 
-
+@pytest.mark.basic
 def test_main_1():
     captureOut = io.StringIO()
     sys.stdout = captureOut
@@ -18,12 +19,13 @@ def test_main_1():
 
     numbers = main.getInput()
     print(f'The original list values: {numbers}')
-    main.insertOne(numbers)
+    main.insertOne(numbers, 20)
     print(f'After insertion 20: {numbers}')
 
     assert numbers == [10, 15, 20, 25, 30, 35]
 
 
+@pytest.mark.edge
 def test_main_2():
     captureOut = io.StringIO()
     sys.stdout = captureOut
@@ -38,7 +40,7 @@ def test_main_2():
 
     numbers = main.getInput()
     print(f'The original list values: {numbers}')
-    main.insertOne(numbers)
+    main.insertOne(numbers, 6)
     print(f'After insertion 6: {numbers}')
     # regex_string = r'[\w,\W]*1'
     # regex_string += r'[\w,\W]*3'
@@ -51,11 +53,12 @@ def test_main_2():
     assert numbers == [1, 2, 3, 4, 5, 6]
 
 
+@pytest.mark.bonus
 def test_main_3():
     captureOut = io.StringIO()
     sys.stdout = captureOut
     # datastr = '90\n10\n50\n40\n30'
-    datastr = '1 2 3 4 5\n0'
+    datastr = '1 2 3 4 5'
     sys.stdin = io.StringIO(datastr)
 
     sys.stdout = sys.__stdout__
@@ -65,52 +68,27 @@ def test_main_3():
 
     numbers = main.getInput()
     print(f'The original list values: {numbers}')
-    main.insertOne(numbers)
+    main.insertOne(numbers, 0)
     print(f'After insertion 0: {numbers}')
 
-    # regex_string = r'[\w,\W]*1'
-    # regex_string += r'[\w,\W]*3'
-    # regex_string += r'[\w,\W]*5'
-    # regex_string += r'[\w,\W]*'
-    # print(regex_string)
-    # res = re.search(regex_string, main.evenlist)
-    # assert res != None
-    # print(res.group())
     assert numbers == [0, 1, 2, 3, 4, 5]
 
-
+@pytest.mark.bonus
 def test_main_4():
-    # captureOut = io.StringIO()
-    # sys.stdout = captureOut
-    # # datastr = '90\n10\n50\n40\n30'
-    # datastr = '1 2 3 4 5\n0'
-    # sys.stdin = io.StringIO(datastr)
-
-    # main.main()
-    # sys.stdout = sys.__stdout__
-    # print('Captured ', captureOut.getvalue())
-    # lines = captureOut.getvalue().split('\n')
-    # print(lines)
-
-    # regex_string = r'[\w,\W]*1'
-    # regex_string += r'[\w,\W]*3'
-    # regex_string += r'[\w,\W]*5'
-    # regex_string += r'[\w,\W]*'
-    # print(regex_string)
-    # res = re.search(regex_string, main.evenlist)
-    # assert res != None
-    # print(res.group())
-    # assert main.main.numbers[0] == 0
-    # assert main.main.numbers[1] == 1
-    # assert main.main.numbers[2] == 2
-    # assert main.main.numbers[3] == 3
-    # assert main.main.numbers[4] == 4
-    # assert main.main.numbers[5] == 5
     detect = 0
     with open('main.py') as f:
         for line in f:
-            if line.find('sort()') != -1:
-                detect = 1
-            if line.find('sorted') != -1:
+            line = line.strip()
+            if line.startswith('#'):
+                continue
+            elif '#' in line:
+                line = line[:line.find('#')]
+            elif line.startswith('"""') or line.startswith("'''"):
+                while True:
+                    nextline = next(f).strip()
+                    if nextline.startswith('"""') or nextline.startswith("'''"):
+                        break
+                continue    
+            if line.find('sort') != -1:
                 detect = 1
     assert detect == 0, 'Do not use any sort functions'
